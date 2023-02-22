@@ -1,5 +1,6 @@
 (ns konnichiwa2)
 
+
 (def code [{"n" "ん"}
            {"wo" "を",
             "zo" "ぞ",
@@ -71,19 +72,22 @@
 (defn n-rest [word n]
       (subs word n (count word)))
 
-(defn break&code [word n]
+(defn size-cap [word cap]
+      (let [size (count word)]
+           (if (< size cap)
+             size
+             cap)))
+
+(defn break-code [word n]
       (if (= n 0)
-        ""
+        ["" ""]
         (if-let [deco (get (nth code (- n 1)) (n-head word n))]
                 [(n-rest word n) deco]
-                (break&code word (- n 1)))))
+                (break-code word (- n 1)))))
 
 (defn decode [word]
-      (let [length (count word)]
-           (cond
-             (= length 0) ""
-             (= length 1) "ん"
-             (= length 2) (let [[rest deco] (break&code word 2)]
-                               (str deco (decode rest)))
-             :else (let [[rest deco] (break&code word 3)]
-                        (str deco (decode rest))))))
+      (if (zero? (count word))
+        ""
+        (let [length (size-cap word 3)
+              [rest deco] (break-code word length)]
+             (str deco (decode rest)))))
